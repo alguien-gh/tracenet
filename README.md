@@ -48,3 +48,7 @@ optional arguments:
 
 Author: Alguien (@alguien_tw) | alguien.site
 ```
+
+## Demo
+
+[![asciicast](https://asciinema.org/a/ay8e0yscvjstf8az9t09mxa0v.png)](https://asciinema.org/a/ay8e0yscvjstf8az9t09mxa0v)
