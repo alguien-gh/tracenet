@@ -5,6 +5,7 @@ Author: Alguien (@alguien_tw) | alguien.site
 Support: devnull@alguien.site
 '''
 import argparse
+import os
 
 from ipwhois import IPWhois
 from scapy.all import *
@@ -18,7 +19,14 @@ class NetUtils(object):
 
     @classmethod
     def random_ip(cls, net):
-        return Net('%s/%d' % (net['ip'], net['mask'])).choice()
+        mask = net['mask']
+        ip = Net('%s/%d' % (net['ip'], mask)).choice()
+        numb = cls.inet_aton(ip)
+        if (numb & ~(~0 << (32 - mask))) == 0:
+            numb += 1
+        if (numb & ~(~0 << (32 - mask))) == (2 ** (32 - mask) - 1):
+            numb -= 1
+        return cls.inet_ntoa(numb)
 
     @classmethod
     def inet_aton(cls, ip):
@@ -767,14 +775,21 @@ def parse_arguments():
     parser.add_argument('-tI', '--icmp-trace', action='store_true', default=False,
                         help='Traceroute using ICMP packets')
 
-    parser.add_argument('--graph', action='store_true', default=False, help='Display graphically.')
-    parser.add_argument('--graph-file', type=str, help='Save the graph to file (SVG format)')
-    parser.add_argument('--verb', type=int, help='Verbose level [1-3]')
+    # Graph Options
+    parser.add_argument('--graph', type=str, help='Save the traceroute graph to file (SVG format)', default=None)
+
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
+
+    if os.geteuid() != 0:
+        TracenetUtils.print_message(
+            msg_type=TracenetUtils.MSG_ERROR,
+            msg='You must be root.'
+        )
+        exit()
 
     mask_limit = args.mask_limit
     if mask_limit is None:
@@ -827,13 +842,28 @@ def main():
     if net is not None:
         TracenetUtils.print_message(
             msg_type=TracenetUtils.MSG_INFO,
-            msg='Network range is: %s/%s. Happy Hacking };)' % (net['ip'], net['mask'])
+            msg='Network range: %s/%s' % (net['ip'], net['mask'])
         )
     else:
         TracenetUtils.print_message(
             msg_type=TracenetUtils.MSG_ERROR,
             msg='Network range not found :('
         )
+
+    if args.graph is not None:
+        filename = args.graph
+        if filename[-4:].lower() != '.svg':
+            filename += '.svg'
+        traceroute.graph_tofile(filename)
+        TracenetUtils.print_message(
+            msg_type=TracenetUtils.MSG_INFO,
+            msg='Traceroute graph saved to: %s' % filename
+        )
+
+    TracenetUtils.print_message(
+        msg_type=TracenetUtils.MSG_INFO,
+        msg='Done'
+    )
 
 
 if __name__ == '__main__':

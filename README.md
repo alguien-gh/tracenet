@@ -18,7 +18,7 @@ Network range discovery tool
 usage: tracenet.py [-h] [-m MASK] [-l MASK_LIMIT] [-nW] [-nI]
                    [--timeout TIMEOUT] [--min-ttl MIN_TTL] [--max-ttl MAX_TTL]
                    [--deep DEEP] [-sn] [-sT] [-sS] [-sP] [-tT] [-tU] [-tI]
-                   [--graph] [--graph-file GRAPH_FILE] [--verb VERB]
+                   [--graph GRAPH]
                    IP
 
 A tool for network range discovery using traceroute.
@@ -44,10 +44,7 @@ optional arguments:
   -tT, --tcp-trace      Traceroute using TCP packets (default)
   -tU, --udp-trace      Traceroute using UDP packets
   -tI, --icmp-trace     Traceroute using ICMP packets
-  --graph               Display graphically.
-  --graph-file GRAPH_FILE
-                        Save the graph to file (SVG format)
-  --verb VERB           Verbose level [1-3]
+  --graph GRAPH         Save the traceroute graph to file (SVG format)
 
 Author: Alguien (@alguien_tw) | alguien.site
 ```
